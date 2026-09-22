@@ -1,0 +1,412 @@
+```html
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2563eb">
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Bisnis Komprehensif</title>
+    <!-- Tailwind CSS dari CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* bg-gray-100 */
+        }
+        /* Custom scrollbar untuk tampilan yang lebih rapi */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8; 
+        }
+    </style>
+</head>
+<body class="text-gray-800 antialiased min-h-screen pb-12">
+
+    <header class="bg-blue-600 text-white py-6 shadow-md mb-8 sticky top-0 z-10">
+        <div class="container mx-auto px-4 max-w-5xl flex justify-between items-center">
+            <h1 class="text-2xl font-bold tracking-tight">Kalkulator Bisnis Pro</h1>
+            <p class="text-blue-100 text-sm hidden sm:block">Analisis Biaya & Profitabilitas</p>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 max-w-5xl">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- Kolom Input Kiri (Biaya dan Proyeksi) -->
+            <div class="lg:col-span-2 space-y-6">
+
+                <!-- A. Struktur Biaya -->
+                <section class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+                        <h2 class="text-lg font-semibold text-gray-800 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                            Biaya Tetap (Fixed Cost) / Bulan
+                        </h2>
+                        <p class="text-xs text-gray-500 mt-1">Biaya yang tidak berubah terlepas dari jumlah produksi.</p>
+                    </div>
+                    <div class="p-6 space-y-4" id="fixed-cost-container">
+                        <!-- Baris Input Biaya Tetap -->
+                        <div class="flex gap-4 items-center">
+                            <input type="text" placeholder="Nama Biaya (Sewa, Gaji, dll)" class="w-1/2 p-2.5 bg-gray-50 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
+                            <div class="relative w-1/2">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500 text-sm">Rp</span>
+                                <input type="number" oninput="calculateAll()" class="fixed-cost-input w-full p-2.5 pl-10 bg-gray-50 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm" placeholder="0">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="px-6 pb-6">
+                        <button onclick="addInputRow('fixed-cost-container', 'fixed-cost-input')" class="text-sm text-blue-600 hover:text-blue-800 font-medium flex items-center">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                            Tambah Biaya Tetap
+                        </button>
+                    </div>
+                </section>
+
+                <section class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+                        <h2 class="text-lg font-semibold text-gray-800 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                            Biaya Variabel per Unit (HPP Dasar)
+                        </h2>
+                        <p class="text-xs text-gray-500 mt-1">Biaya produksi per 1 barang (Bahan baku, kemasan).</p>
+                    </div>
+                    <div class="p-6 space-y-4" id="variable-cost-container">
+                        <!-- Baris Input Biaya Variabel -->
+                        <div class="flex gap-4 items-center">
+                            <input type="text" placeholder="Nama Biaya (Bahan A, Dus, dll)" class="w-1/2 p-2.5 bg-gray-50 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
+                            <div class="relative w-1/2">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500 text-sm">Rp</span>
+                                <input type="number" oninput="calculateAll()" class="variable-cost-input w-full p-2.5 pl-10 bg-gray-50 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm" placeholder="0">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="px-6 pb-6">
+                        <button onclick="addInputRow('variable-cost-container', 'variable-cost-input')" class="text-sm text-green-600 hover:text-green-800 font-medium flex items-center">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                            Tambah Biaya Variabel
+                        </button>
+                    </div>
+                </section>
+
+                <section class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+                        <h2 class="text-lg font-semibold text-gray-800 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"></path></svg>
+                            Biaya Operasional (OpEx) / Bulan
+                        </h2>
+                        <p class="text-xs text-gray-500 mt-1">Biaya pemasaran, iklan, ongkir bulanan.</p>
+                    </div>
+                    <div class="p-6 space-y-4" id="opex-cost-container">
+                         <!-- Baris Input OpEx -->
+                         <div class="flex gap-4 items-center">
+                            <input type="text" placeholder="Nama Biaya (Iklan FB, Ongkir)" class="w-1/2 p-2.5 bg-gray-50 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
+                            <div class="relative w-1/2">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500 text-sm">Rp</span>
+                                <input type="number" oninput="calculateAll()" class="opex-cost-input w-full p-2.5 pl-10 bg-gray-50 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm" placeholder="0">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="px-6 pb-6">
+                        <button onclick="addInputRow('opex-cost-container', 'opex-cost-input')" class="text-sm text-purple-600 hover:text-purple-800 font-medium flex items-center">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                            Tambah Biaya Operasional
+                        </button>
+                    </div>
+                </section>
+
+                <!-- B. Proyeksi & Harga Jual -->
+                <section class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+                        <h2 class="text-lg font-semibold text-gray-800 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            Harga Jual & Proyeksi Penjualan
+                        </h2>
+                    </div>
+                    <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block mb-2 text-sm font-medium text-gray-700">Harga Jual per Unit</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500 text-sm">Rp</span>
+                                <input type="number" id="input-price" oninput="calculateAll()" class="w-full p-2.5 pl-10 bg-gray-50 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="Contoh: 50000" value="0">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block mb-2 text-sm font-medium text-gray-700">Estimasi Terjual per Bulan (Unit)</label>
+                            <div class="relative">
+                                <input type="number" id="input-volume" oninput="calculateAll()" class="w-full p-2.5 bg-gray-50 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="Contoh: 1000" value="0">
+                                <span class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 text-sm">Unit</span>
+                            </div>
+                        </div>
+                        <div class="md:col-span-2">
+                             <label class="block mb-2 text-sm font-medium text-gray-700">Estimasi Pajak Pendapatan (%) - Opsional</label>
+                             <div class="relative w-1/2">
+                                <input type="number" id="input-tax" oninput="calculateAll()" class="w-full p-2.5 bg-gray-50 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="0" value="0">
+                                <span class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 text-sm">%</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Kolom Output Kanan (Hasil) -->
+            <div class="lg:col-span-1">
+                <div class="bg-gray-800 rounded-xl shadow-xl border border-gray-700 overflow-hidden sticky top-28">
+                    <div class="p-6 border-b border-gray-700">
+                        <h2 class="text-xl font-bold text-white mb-1">Ringkasan Finansial</h2>
+                        <p class="text-gray-400 text-xs">Perhitungan real-time per bulan</p>
+                    </div>
+
+                    <div class="p-6 space-y-6">
+                        
+                        <!-- 1. HPP -->
+                        <div class="bg-gray-700/50 p-4 rounded-lg">
+                            <p class="text-gray-400 text-xs uppercase font-semibold tracking-wider mb-1">Harga Pokok Penjualan (HPP)</p>
+                            <p class="text-2xl font-bold text-white" id="out-hpp">Rp 0 <span class="text-sm font-normal text-gray-400">/unit</span></p>
+                        </div>
+
+                        <!-- 2. BEP -->
+                        <div>
+                            <p class="text-gray-400 text-xs uppercase font-semibold tracking-wider mb-2">Titik Impas (Break-Even Point)</p>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div class="bg-gray-700/50 p-3 rounded-lg border-l-4 border-yellow-500">
+                                    <p class="text-gray-400 text-[10px] uppercase">BEP Unit</p>
+                                    <p class="text-lg font-bold text-white" id="out-bep-unit">0 <span class="text-xs font-normal">unit</span></p>
+                                </div>
+                                <div class="bg-gray-700/50 p-3 rounded-lg border-l-4 border-yellow-500">
+                                    <p class="text-gray-400 text-[10px] uppercase">BEP Rupiah</p>
+                                    <p class="text-lg font-bold text-white truncate" id="out-bep-rupiah" title="Rp 0">Rp 0</p>
+                                </div>
+                            </div>
+                             <p class="text-xs text-gray-400 mt-2 italic" id="bep-status-msg">Jual <span class="font-bold text-white" id="msg-bep-unit">0</span> unit untuk balik modal bulan ini.</p>
+                        </div>
+
+                        <!-- 3. Margin Keuntungan -->
+                        <div class="space-y-3 pt-4 border-t border-gray-700">
+                            <div>
+                                <div class="flex justify-between items-end mb-1">
+                                    <p class="text-gray-400 text-xs uppercase font-semibold tracking-wider">Laba Kotor (Gross Profit)</p>
+                                    <p class="text-sm font-bold text-green-400" id="out-gross-margin">0%</p>
+                                </div>
+                                <p class="text-xl font-bold text-white" id="out-gross-profit">Rp 0</p>
+                                <p class="text-[10px] text-gray-500 mt-0.5">Pendapatan - HPP (tanpa Fixed & OpEx)</p>
+                            </div>
+
+                            <div class="pt-3 border-t border-gray-700/50">
+                                <div class="flex justify-between items-end mb-1">
+                                    <p class="text-gray-400 text-xs uppercase font-semibold tracking-wider text-blue-300">Laba Bersih (Net Profit)</p>
+                                    <p class="text-sm font-bold text-blue-400" id="out-net-margin">0%</p>
+                                </div>
+                                <p class="text-2xl font-bold text-blue-400" id="out-net-profit">Rp 0</p>
+                                <p class="text-[10px] text-gray-500 mt-0.5">Laba setelah semua biaya & pajak</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        /**
+         * Format angka menjadi mata uang Rupiah
+         */
+        function formatRupiah(number) {
+            if (isNaN(number) || !isFinite(number)) return "Rp 0";
+            return new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(number);
+        }
+
+        /**
+         * Format angka biasa dengan pemisah ribuan
+         */
+        function formatNumber(number) {
+            if (isNaN(number) || !isFinite(number)) return "0";
+            return new Intl.NumberFormat('id-ID').format(Math.ceil(number));
+        }
+
+        /**
+         * Menambahkan baris input baru untuk biaya
+         * @param {string} containerId - ID elemen container
+         * @param {string} inputClass - Kelas khusus untuk input nilai agar bisa di-loop saat kalkulasi
+         */
+        function addInputRow(containerId, inputClass) {
+            const container = document.getElementById(containerId);
+            const row = document.createElement('div');
+            row.className = 'flex gap-4 items-center mt-3 opacity-0 transition-opacity duration-300 ease-in';
+            
+            // Nama placeholder berdasarkan tipe
+            let namePlaceholder = "Nama Biaya";
+            if(inputClass.includes("fixed")) namePlaceholder = "Biaya Tetap Lainnya";
+            else if(inputClass.includes("variable")) namePlaceholder = "Biaya Variabel Lainnya";
+            else if(inputClass.includes("opex")) namePlaceholder = "Biaya Ops Lainnya";
+
+            row.innerHTML = `
+                <input type="text" placeholder="${namePlaceholder}" class="w-[45%] p-2.5 bg-gray-50 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
+                <div class="relative w-[45%]">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500 text-sm">Rp</span>
+                    <input type="number" oninput="calculateAll()" class="${inputClass} w-full p-2.5 pl-10 bg-gray-50 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm" placeholder="0">
+                </div>
+                <button onclick="this.parentElement.remove(); calculateAll();" class="w-[10%] text-red-500 hover:text-red-700 p-2 rounded-lg hover:bg-red-50 flex justify-center items-center">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                </button>
+            `;
+            container.appendChild(row);
+            
+            // Trigger reflow untuk animasi fade-in
+            setTimeout(() => {
+                row.classList.remove('opacity-0');
+            }, 10);
+        }
+
+        /**
+         * Fungsi utama untuk menghitung semua metrics
+         * Dipanggil setiap kali ada perubahan pada input
+         */
+        function calculateAll() {
+            // 1. Ambil & Jumlahkan Biaya Tetap (Fixed Cost)
+            let totalFixedCost = 0;
+            document.querySelectorAll('.fixed-cost-input').forEach(input => {
+                totalFixedCost += Number(input.value) || 0;
+            });
+
+            // 2. Ambil & Jumlahkan Biaya Variabel per Unit (HPP)
+            let hppPerUnit = 0;
+            document.querySelectorAll('.variable-cost-input').forEach(input => {
+                hppPerUnit += Number(input.value) || 0;
+            });
+
+            // 3. Ambil & Jumlahkan Biaya Operasional (OpEx)
+            let totalOpex = 0;
+            document.querySelectorAll('.opex-cost-input').forEach(input => {
+                totalOpex += Number(input.value) || 0;
+            });
+
+            // 4. Ambil Harga Jual, Volume, dan Pajak
+            const sellingPrice = Number(document.getElementById('input-price').value) || 0;
+            const volume = Number(document.getElementById('input-volume').value) || 0;
+            const taxRate = Number(document.getElementById('input-tax').value) || 0;
+
+            // --- KALKULASI FINANSIAL ---
+
+            // Total Biaya Tetap Gabungan (Fixed Cost + OpEx bulanan)
+            const totalFixedAndOpex = totalFixedCost + totalOpex;
+
+            // Margin Kontribusi per Unit (Harga Jual - HPP)
+            const contributionMarginPerUnit = sellingPrice - hppPerUnit;
+
+            // A. Menghitung BEP (Break Even Point)
+            let bepUnit = 0;
+            let bepRupiah = 0;
+            
+            if (contributionMarginPerUnit > 0) {
+                bepUnit = totalFixedAndOpex / contributionMarginPerUnit;
+                bepRupiah = bepUnit * sellingPrice;
+            }
+
+            // B. Menghitung Laba Kotor (Gross Profit)
+            // Gross Profit = Total Pendapatan - Total HPP (HPP unit * Volume)
+            const totalRevenue = sellingPrice * volume;
+            const totalCOGS = hppPerUnit * volume;
+            const grossProfit = totalRevenue - totalCOGS;
+            let grossProfitMargin = 0;
+            if (totalRevenue > 0) {
+                grossProfitMargin = (grossProfit / totalRevenue) * 100;
+            }
+
+            // C. Menghitung Laba Bersih (Net Profit) sebelum pajak
+            const netProfitBeforeTax = grossProfit - totalFixedAndOpex;
+            
+            // Potongan Pajak
+            const taxAmount = netProfitBeforeTax > 0 ? (netProfitBeforeTax * (taxRate / 100)) : 0;
+            
+            // Laba Bersih Setelah Pajak
+            const netProfit = netProfitBeforeTax - taxAmount;
+
+            let netProfitMargin = 0;
+            if (totalRevenue > 0) {
+                netProfitMargin = (netProfit / totalRevenue) * 100;
+            }
+
+            // --- UPDATE UI ---
+            
+            // HPP
+            document.getElementById('out-hpp').innerHTML = `${formatRupiah(hppPerUnit)} <span class="text-sm font-normal text-gray-400">/unit</span>`;
+
+            // BEP
+            const elBepUnit = document.getElementById('out-bep-unit');
+            const elBepRupiah = document.getElementById('out-bep-rupiah');
+            const elMsgBepUnit = document.getElementById('msg-bep-unit');
+
+            if (contributionMarginPerUnit <= 0 && sellingPrice > 0) {
+                elBepUnit.innerHTML = `<span class="text-red-400 text-sm">Rugi! Harga < HPP</span>`;
+                elBepRupiah.innerHTML = `-`;
+                document.getElementById('bep-status-msg').innerHTML = `<span class="text-red-400">Harga jual Anda lebih rendah dari biaya produksi.</span>`;
+            } else if (sellingPrice === 0) {
+                 elBepUnit.innerHTML = `0 <span class="text-xs font-normal">unit</span>`;
+                 elBepRupiah.innerHTML = `Rp 0`;
+                 document.getElementById('bep-status-msg').innerHTML = `Tentukan harga jual.`;
+            } else {
+                elBepUnit.innerHTML = `${formatNumber(bepUnit)} <span class="text-xs font-normal">unit</span>`;
+                
+                const formattedBepRp = formatRupiah(bepRupiah);
+                elBepRupiah.innerText = formattedBepRp;
+                elBepRupiah.title = formattedBepRp; // Untuk tooltip jika kepotong
+
+                document.getElementById('bep-status-msg').innerHTML = `Jual <span class="font-bold text-white">${formatNumber(bepUnit)}</span> unit untuk balik modal bulan ini.`;
+            }
+
+            // Gross Profit
+            document.getElementById('out-gross-profit').innerText = formatRupiah(grossProfit);
+            document.getElementById('out-gross-margin').innerText = grossProfitMargin.toFixed(1) + '%';
+            
+            // Net Profit
+            const elNetProfit = document.getElementById('out-net-profit');
+            elNetProfit.innerText = formatRupiah(netProfit);
+            document.getElementById('out-net-margin').innerText = netProfitMargin.toFixed(1) + '%';
+
+            // Ganti warna teks Net Profit jika minus (Rugi)
+            if (netProfit < 0) {
+                elNetProfit.classList.remove('text-blue-400');
+                elNetProfit.classList.add('text-red-400');
+                document.getElementById('out-net-margin').classList.replace('text-blue-400', 'text-red-400');
+            } else {
+                elNetProfit.classList.add('text-blue-400');
+                elNetProfit.classList.remove('text-red-400');
+                document.getElementById('out-net-margin').classList.replace('text-red-400', 'text-blue-400');
+            }
+        }
+
+        // Jalankan kalkulasi awal saat halaman dimuat
+        window.onload = () => {
+            calculateAll();
+        };
+
+    </script>
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js')
+      .then(() => console.log('Service Worker Terdaftar'));
+  }
+</script>
+
+</body>
+</html>
+```
