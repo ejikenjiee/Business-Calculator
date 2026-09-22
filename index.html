@@ -1,0 +1,1558 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2563eb">
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Bisnis Pro</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#ecfdf5',
+                            100: '#d1fae5',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
+                            800: '#065f46',
+                            900: '#064e3b',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="text-slate-800 dark:text-slate-100 antialiased min-h-screen flex justify-center bg-slate-900 transition-colors duration-200">
+
+    <!-- Container Utama Mobile Shell -->
+    <div class="w-full max-w-md bg-slate-50 dark:bg-slate-900 min-h-screen flex flex-col relative shadow-2xl overflow-x-hidden transition-colors duration-200">
+
+        <!-- Navigation Bar / Header Dynamic -->
+        <header id="main-header" class="bg-slate-50 dark:bg-slate-900 pt-5 px-5 pb-3 sticky top-0 z-20 transition-all duration-200">
+            <!-- Header Home View -->
+            <div id="header-home" class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-2xl font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
+                        <span id="greeting-text">Selamat Pagi</span> <span class="animate-bounce">👋</span>
+                    </h1>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5" id="current-date-str">Memuat tanggal...</p>
+                </div>
+                <div class="relative">
+                    <button onclick="switchTab('profile')" id="header-avatar-btn" class="w-10 h-10 rounded-full bg-brand-800 text-white font-bold flex items-center justify-center text-sm shadow-md hover:bg-brand-900 transition cursor-pointer">
+                        U
+                    </button>
+                </div>
+            </div>
+
+            <!-- Header Generic Page View (Hidden by default) -->
+            <div id="header-page" class="hidden flex justify-between items-center py-1 relative">
+                <button onclick="switchTab('home')" class="p-2 -ml-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 transition">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                </button>
+                <h2 id="page-title" class="text-lg font-bold text-slate-900 dark:text-white">Detail Perhitungan</h2>
+                <div class="flex items-center gap-1">
+                    <button id="header-search-btn" onclick="toggleSearchBar()" class="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 transition" title="Cari Data">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </button>
+                    <button onclick="toggleMoreMenu()" class="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 transition" title="Menu Opsi">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Expandable Search Input Bar -->
+            <div id="search-bar-container" class="hidden mt-2 pt-2 border-t border-slate-100 dark:border-slate-800 transition-all duration-200">
+                <div class="relative">
+                    <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </span>
+                    <input type="text" id="global-search-input" oninput="handleGlobalSearch(this.value)" placeholder="Cari item atau bahan..." class="w-full pl-10 pr-10 py-2.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-800 dark:text-slate-100 font-semibold focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    <button onclick="clearSearchInput()" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Dropdown Menu Opsi (3-Dots Menu) -->
+            <div id="more-options-menu" class="hidden absolute right-5 top-14 w-52 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 py-2 z-50">
+                <div class="px-4 py-2 border-b border-slate-100 dark:border-slate-700">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Opsi Aplikasi</p>
+                </div>
+                <button onclick="exportDataJSON(); toggleMoreMenu();" class="w-full text-left px-4 py-2.5 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-2">
+                    <svg class="w-4 h-4 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    Ekspor Backup Data
+                </button>
+                <button onclick="triggerImportJSON(); toggleMoreMenu();" class="w-full text-left px-4 py-2.5 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-2">
+                    <svg class="w-4 h-4 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                    Impor / Pulihkan Data
+                </button>
+                <input type="file" id="import-file-input" accept=".json" onchange="importDataJSON(event)" class="hidden">
+                <div class="border-t border-slate-100 dark:border-slate-700 my-1"></div>
+                <button onclick="resetDataToDefault(); toggleMoreMenu();" class="w-full text-left px-4 py-2.5 text-xs font-semibold text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 flex items-center gap-2">
+                    <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    Reset Data Bawaan
+                </button>
+            </div>
+        </header>
+
+        <!-- Content Container -->
+        <main class="flex-1 px-5 pb-24 space-y-5">
+
+            <!-- ================= VIEW 1: HOME / DASHBOARD ================= -->
+            <section id="view-home" class="space-y-5">
+                
+                <!-- Card Ringkasan Bisnis -->
+                <div class="bg-gradient-to-br from-brand-900 via-brand-800 to-brand-700 rounded-3xl p-5 text-white shadow-xl relative overflow-hidden">
+                    <div class="absolute -right-6 -bottom-6 w-32 h-32 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-sm font-medium text-emerald-200">Ringkasan Bisnis</p>
+                            <p class="text-xs text-emerald-300/80 font-light" id="card-date-str">Memuat tanggal...</p>
+                        </div>
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                            Aktif
+                        </span>
+                    </div>
+
+                    <div class="mt-6 flex items-baseline gap-2">
+                        <span class="text-4xl font-extrabold tracking-tight" id="count-calc-month">0</span>
+                        <div class="text-xs text-emerald-200 leading-tight">
+                            kalkulasi<br>bulan ini
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats Count Widgets -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div onclick="switchTab('produk')" class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm flex items-center gap-3 cursor-pointer hover:border-brand-500/30 transition">
+                        <div class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                        </div>
+                        <div>
+                            <p class="text-lg font-bold text-slate-900 dark:text-white leading-none" id="stat-total-produk">0</p>
+                            <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mt-1">PRODUK</p>
+                        </div>
+                    </div>
+
+                    <div onclick="switchTab('bahan')" class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm flex items-center gap-3 cursor-pointer hover:border-brand-500/30 transition">
+                        <div class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                        </div>
+                        <div>
+                            <p class="text-lg font-bold text-slate-900 dark:text-white leading-none" id="stat-total-material">0</p>
+                            <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mt-1">MATERIAL</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Navigation Grid -->
+                <div class="grid grid-cols-4 gap-3 text-center">
+                    <button onclick="switchTab('bahan')" class="flex flex-col items-center gap-2 group">
+                        <div class="w-14 h-14 rounded-2xl bg-emerald-50 dark:bg-slate-800 border border-emerald-100 dark:border-slate-700 flex items-center justify-center text-brand-600 dark:text-emerald-400 shadow-sm group-active:scale-95 transition">
+                            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                        </div>
+                        <span class="text-xs font-semibold text-slate-700 dark:text-slate-300">Bahan</span>
+                    </button>
+
+                    <button onclick="switchTab('produk')" class="flex flex-col items-center gap-2 group">
+                        <div class="w-14 h-14 rounded-2xl bg-emerald-50 dark:bg-slate-800 border border-emerald-100 dark:border-slate-700 flex items-center justify-center text-brand-600 dark:text-emerald-400 shadow-sm group-active:scale-95 transition">
+                            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                        </div>
+                        <span class="text-xs font-semibold text-slate-700 dark:text-slate-300">Produk</span>
+                    </button>
+
+                    <button onclick="openNewCalcForm()" class="flex flex-col items-center gap-2 group">
+                        <div class="w-14 h-14 rounded-2xl bg-emerald-50 dark:bg-slate-800 border border-emerald-100 dark:border-slate-700 flex items-center justify-center text-brand-600 dark:text-emerald-400 shadow-sm group-active:scale-95 transition">
+                            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                        </div>
+                        <span class="text-xs font-semibold text-slate-700 dark:text-slate-300">Hitung</span>
+                    </button>
+
+                    <button onclick="switchTab('bep')" class="flex flex-col items-center gap-2 group">
+                        <div class="w-14 h-14 rounded-2xl bg-emerald-50 dark:bg-slate-800 border border-emerald-100 dark:border-slate-700 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shadow-sm group-active:scale-95 transition">
+                            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 6l3 18h12l3-18H3zm3 0V4a2 2 0 012-2h8a2 2 0 012 2v2M9 14l2 2 4-4"></path></svg>
+                        </div>
+                        <span class="text-xs font-semibold text-slate-700 dark:text-slate-300">Laman BEP</span>
+                    </button>
+                </div>
+
+                <!-- Aktivitas Terakhir Section -->
+                <div>
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-base font-bold text-slate-900 dark:text-white">Aktivitas Terakhir</h3>
+                        <button onclick="switchTab('riwayat')" class="text-xs font-bold text-brand-600 dark:text-emerald-400 hover:text-brand-800">Lihat Semua</button>
+                    </div>
+
+                    <div id="recent-activities-list" class="space-y-3">
+                        <!-- Items rendered via JavaScript -->
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- ================= VIEW 2: BAHAN BAKU ================= -->
+            <section id="view-bahan" class="hidden space-y-4">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-900 dark:text-white">Daftar Bahan Baku</h2>
+                        <p class="text-xs text-slate-500 dark:text-slate-400" id="bahan-found-text">0 bahan ditemukan</p>
+                    </div>
+                    <button onclick="openAddMaterialModal()" class="px-4 py-2 bg-brand-800 hover:bg-brand-900 text-white rounded-xl text-xs font-bold shadow-sm flex items-center gap-1.5 transition active:scale-95">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        Tambah Bahan
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm">
+                        <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Total Bahan</p>
+                        <p class="text-xl font-bold text-slate-900 dark:text-white" id="bahan-count-val">0</p>
+                    </div>
+                    <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm">
+                        <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Total Nilai</p>
+                        <p class="text-base font-bold text-slate-900 dark:text-white truncate" id="bahan-value-val">Rp0</p>
+                    </div>
+                </div>
+
+                <div id="materials-list" class="space-y-2.5">
+                    <!-- Dynamic materials list -->
+                </div>
+            </section>
+
+            <!-- ================= VIEW 3: PRODUK ================= -->
+            <section id="view-produk" class="hidden space-y-4">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-900 dark:text-white">Daftar Produk & Resep</h2>
+                        <p class="text-xs text-slate-500 dark:text-slate-400" id="product-found-text">0 produk ditemukan</p>
+                    </div>
+                    <button onclick="openNewCalcForm()" class="px-4 py-2 bg-brand-800 hover:bg-brand-900 text-white rounded-xl text-xs font-bold shadow-sm flex items-center gap-1.5 transition active:scale-95">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        Buat Produk
+                    </button>
+                </div>
+
+                <div id="products-list" class="space-y-4">
+                    <!-- Dynamic products list -->
+                </div>
+            </section>
+
+            <!-- ================= VIEW 4: DETAIL PERHITUNGAN ================= -->
+            <section id="view-detail" class="hidden space-y-4">
+                <div class="bg-brand-800 rounded-3xl p-5 text-white shadow-lg flex justify-between items-center">
+                    <div>
+                        <h2 class="text-xl font-bold tracking-tight" id="detail-title">Produk</h2>
+                        <p class="text-xs text-emerald-200/80 mt-1" id="detail-date">-</p>
+                    </div>
+                    <div class="px-3 py-1.5 rounded-xl bg-white/10 text-xs font-bold text-emerald-100 border border-white/10">
+                        <span id="detail-pcs">1</span> pcs
+                    </div>
+                </div>
+
+                <div class="flex gap-2">
+                    <button onclick="triggerEditCurrentDetail()" class="flex-1 py-3 bg-brand-800 hover:bg-brand-900 text-white font-bold text-xs rounded-2xl shadow-sm flex items-center justify-center gap-2 transition active:scale-95">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                        Edit Produk
+                    </button>
+                    <button onclick="triggerDeleteCurrentDetail()" class="py-3 px-4 bg-red-50 dark:bg-red-900/30 hover:bg-red-100 text-red-600 font-bold text-xs rounded-2xl border border-red-200/80 dark:border-red-900 flex items-center justify-center gap-1.5 transition active:scale-95">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        Hapus
+                    </button>
+                </div>
+
+                <div class="bg-white dark:bg-slate-800 rounded-3xl p-5 border border-slate-100 dark:border-slate-800 shadow-sm space-y-4">
+                    <div class="grid grid-cols-2 gap-3 pb-3 border-b border-slate-100 dark:border-slate-700">
+                        <div class="bg-slate-50 dark:bg-slate-700/50 p-3 rounded-2xl border border-slate-100 dark:border-slate-700">
+                            <p class="text-[11px] text-slate-500 dark:text-slate-400 font-medium">1. HPP (Modal Unit)</p>
+                            <p class="text-lg font-extrabold text-slate-900 dark:text-white mt-0.5" id="detail-hpp">Rp0</p>
+                        </div>
+                        <div class="bg-emerald-50/70 dark:bg-emerald-950/40 p-3 rounded-2xl border border-emerald-100 dark:border-emerald-900">
+                            <p class="text-[11px] text-brand-800 dark:text-emerald-400 font-semibold">2. Harga Rekomendasi</p>
+                            <p class="text-lg font-extrabold text-brand-800 dark:text-emerald-300 mt-0.5" id="detail-recommended-price">Rp0</p>
+                            <p class="text-[9px] text-brand-600 dark:text-emerald-400 mt-0.5">Margin target: <span id="detail-base-margin">25%</span></p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center">
+                            <label class="text-xs font-bold text-slate-800 dark:text-slate-200">3. Harga Tetapan Sendiri (Harga Jual)</label>
+                            <button onclick="applyRecommendedToCustom()" class="text-[11px] font-bold text-brand-600 dark:text-emerald-400 hover:text-brand-800 bg-brand-50 dark:bg-slate-700 px-2.5 py-1 rounded-lg transition border border-brand-200/60">
+                                ⚡ Gunakan Rekomendasi
+                            </button>
+                        </div>
+                        <div class="relative">
+                            <span class="absolute left-3.5 top-1/2 -translate-y-1/2 font-bold text-sm text-slate-400">Rp</span>
+                            <input type="text" inputmode="numeric" id="detail-input-custom-price" oninput="formatInputThousands(this); handleCustomPriceInputChanged();" placeholder="0" class="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl font-extrabold text-slate-900 dark:text-white text-base focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                        </div>
+                    </div>
+
+                    <div class="bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200/80 dark:border-emerald-900 rounded-2xl p-4 space-y-2">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <p class="text-xs font-bold text-emerald-900 dark:text-emerald-300">4. Profit Per Produk</p>
+                            </div>
+                            <span class="inline-block px-3 py-1 rounded-full text-xs font-extrabold bg-emerald-500 text-white shadow-sm" id="detail-final-margin">
+                                +0%
+                            </span>
+                        </div>
+                        <div class="flex justify-between items-baseline pt-1">
+                            <p class="text-2xl font-black text-emerald-700 dark:text-emerald-300" id="detail-profit">Rp0</p>
+                            <p class="text-[10px] text-emerald-800 dark:text-emerald-400 font-semibold">Laba bersih per unit</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-slate-800 rounded-3xl p-5 border border-slate-100 dark:border-slate-800 shadow-sm space-y-3">
+                    <h3 class="text-sm font-bold text-slate-900 dark:text-white">Komposisi Biaya</h3>
+                    <div class="space-y-1.5 text-xs">
+                        <div class="flex justify-between">
+                            <span class="text-slate-600 dark:text-slate-400 font-medium">Bahan:</span>
+                            <span class="font-bold text-slate-900 dark:text-white" id="detail-cost-bahan">Rp0</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-600 dark:text-slate-400 font-medium">Tenaga Kerja:</span>
+                            <span class="font-bold text-slate-900 dark:text-white" id="detail-cost-tenaga">Rp0</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-600 dark:text-slate-400 font-medium">Overhead:</span>
+                            <span class="font-bold text-slate-900 dark:text-white" id="detail-cost-overhead">Rp0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-slate-800 rounded-3xl p-5 border border-slate-100 dark:border-slate-800 shadow-sm space-y-3">
+                    <h3 class="text-sm font-bold text-slate-900 dark:text-white">Bahan Baku Digunakan (<span id="detail-bahan-count">0</span>)</h3>
+                    <div id="detail-ingredients-list" class="space-y-3 pt-1">
+                        <!-- Dynamic ingredients -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= VIEW 5: KALKULATOR BARU / EDIT ================= -->
+            <section id="view-hitung" class="hidden space-y-4">
+                <div class="bg-white dark:bg-slate-800 p-5 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm space-y-4">
+                    <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-3">
+                        <h3 class="text-base font-bold text-slate-900 dark:text-white" id="calc-form-title">Kalkulasi HPP Baru</h3>
+                        <button id="btn-cancel-edit" onclick="switchTab('home')" class="text-xs font-bold text-slate-400 hover:text-slate-600">Batal</button>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Nama Produk / Resep</label>
+                        <input type="text" id="calc-input-name" placeholder="Contoh: Kopi Susu Aren" class="w-full p-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="text-xs font-semibold text-slate-700 dark:text-slate-300">Komposisi Bahan Baku</label>
+                            <button onclick="addCalcIngredientRow()" class="text-xs font-bold text-brand-600 dark:text-emerald-400 flex items-center gap-1">+ Tambah Bahan</button>
+                        </div>
+                        <div id="calc-ingredients-container" class="space-y-2">
+                            <!-- Dynamic rows -->
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3 pt-2">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Tenaga Kerja (Rp)</label>
+                            <input type="text" inputmode="numeric" id="calc-input-labor" value="0" oninput="formatInputThousands(this); runLiveCalculation();" class="w-full p-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Overhead (Rp)</label>
+                            <input type="text" inputmode="numeric" id="calc-input-overhead" value="1.000" oninput="formatInputThousands(this); runLiveCalculation();" class="w-full p-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Target Margin (%)</label>
+                            <input type="number" id="calc-input-margin" value="25" oninput="runLiveCalculation()" class="w-full p-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Pembulatan Ke</label>
+                            <select id="calc-input-rounding" onchange="runLiveCalculation()" class="w-full p-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                                <option value="1">Tanpa Pembulatan</option>
+                                <option value="100" selected>Rp 100</option>
+                                <option value="500">Rp 500</option>
+                                <option value="1000">Rp 1.000</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Live Calculation Preview Box -->
+                    <div class="bg-slate-900 text-white p-4 rounded-2xl space-y-2 mt-4">
+                        <div class="flex justify-between items-center text-xs text-slate-400">
+                            <span>Estimasi HPP Per Unit:</span>
+                            <span class="font-bold text-white text-sm" id="calc-preview-hpp">Rp0</span>
+                        </div>
+                        <div class="flex justify-between items-center text-xs text-emerald-400">
+                            <span>Harga Jual Rekomendasi:</span>
+                            <span class="font-black text-emerald-300 text-base" id="calc-preview-price">Rp0</span>
+                        </div>
+                    </div>
+
+                    <button onclick="saveProductCalculation()" class="w-full py-3.5 bg-brand-800 hover:bg-brand-900 text-white font-bold text-sm rounded-2xl shadow-md transition active:scale-95">
+                        Simpan & Hitung HPP 🚀
+                    </button>
+                </div>
+            </section>
+
+            <!-- ================= VIEW 6: RIWAYAT / AKTIVITAS ================= -->
+            <section id="view-riwayat" class="hidden space-y-4">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-lg font-bold text-slate-900 dark:text-white">Semua Riwayat Aktivitas</h2>
+                    <button onclick="clearAllHistory()" class="text-xs font-semibold text-red-500 hover:underline">Hapus Riwayat</button>
+                </div>
+                <div id="full-history-list" class="space-y-3">
+                    <!-- Dynamic history list -->
+                </div>
+            </section>
+
+            <!-- ================= VIEW 7: BREAK-EVEN POINT (BEP) ================= -->
+            <section id="view-bep" class="hidden space-y-4">
+                <div class="bg-gradient-to-br from-emerald-900 via-slate-900 to-brand-900 rounded-3xl p-5 text-white shadow-xl space-y-2">
+                    <div class="flex items-center gap-2 text-emerald-400 font-bold text-xs uppercase tracking-wider">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                        Analisis Titik Impas (BEP)
+                    </div>
+                    <h2 class="text-xl font-extrabold tracking-tight">Kalkulator BEP & Target Laba</h2>
+                    <p class="text-xs text-slate-300 leading-relaxed">
+                        Ketahui berapa porsi/unit yang harus terjual setiap bulan untuk menutup biaya operasional.
+                    </p>
+                </div>
+
+                <div class="bg-white dark:bg-slate-800 p-5 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-800 dark:text-slate-200 mb-1">Pilih Produk / Resep Utama</label>
+                        <select id="bep-product-select" onchange="onBepProductSelected()" class="w-full p-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-sm font-semibold text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                            <!-- Dynamic select options -->
+                        </select>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1">Harga Jual / Unit (Rp)</label>
+                            <input type="text" inputmode="numeric" id="bep-input-price" oninput="formatInputThousands(this); runBepCalculation();" class="w-full p-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-sm font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1">HPP / Unit (Rp)</label>
+                            <input type="text" inputmode="numeric" id="bep-input-hpp" oninput="formatInputThousands(this); runBepCalculation();" class="w-full p-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-sm font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                        </div>
+                    </div>
+
+                    <div class="pt-2 border-t border-slate-100 dark:border-slate-700 space-y-3">
+                        <div class="flex justify-between items-center">
+                            <h4 class="text-xs font-bold text-slate-900 dark:text-white">Biaya Tetap Operasional / Bulan (Fixed Cost)</h4>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[11px] font-medium text-slate-500 mb-1">Sewa Tempat (Rp)</label>
+                                <input type="text" inputmode="numeric" id="bep-fc-sewa" value="500.000" oninput="formatInputThousands(this); runBepCalculation();" class="w-full p-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 rounded-xl text-xs text-slate-900 dark:text-white">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-medium text-slate-500 mb-1">Gaji Tetap (Rp)</label>
+                                <input type="text" inputmode="numeric" id="bep-fc-gaji" value="1.000.000" oninput="formatInputThousands(this); runBepCalculation();" class="w-full p-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 rounded-xl text-xs text-slate-900 dark:text-white">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[11px] font-medium text-slate-500 mb-1">Listrik & Wifi (Rp)</label>
+                                <input type="text" inputmode="numeric" id="bep-fc-utility" value="200.000" oninput="formatInputThousands(this); runBepCalculation();" class="w-full p-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 rounded-xl text-xs text-slate-900 dark:text-white">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-medium text-slate-500 mb-1">Lain-lain (Rp)</label>
+                                <input type="text" inputmode="numeric" id="bep-fc-lain" value="100.000" oninput="formatInputThousands(this); runBepCalculation();" class="w-full p-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 rounded-xl text-xs text-slate-900 dark:text-white">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-2 border-t border-slate-100 dark:border-slate-700">
+                        <label class="block text-xs font-bold text-slate-800 dark:text-slate-200 mb-1">Target Laba Bersih / Bulan (Opsional)</label>
+                        <div class="relative">
+                            <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">Rp</span>
+                            <input type="text" inputmode="numeric" id="bep-input-target-profit" value="2.000.000" oninput="formatInputThousands(this); runBepCalculation();" class="w-full pl-9 pr-3 py-2.5 bg-emerald-50/50 dark:bg-emerald-950/40 border border-emerald-200 rounded-xl text-xs font-bold text-emerald-900 dark:text-emerald-300">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 text-white rounded-3xl p-5 space-y-4 shadow-xl">
+                    <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                        <h3 class="text-sm font-bold text-emerald-400">Hasil Analisis Titik Impas</h3>
+                        <span class="text-[10px] text-slate-400">Margin Kontribusi: <strong id="bep-res-margin-unit" class="text-white">Rp0</strong>/unit</span>
+                    </div>
+
+                    <div class="bg-slate-800/80 rounded-2xl p-4 border border-slate-700 space-y-2">
+                        <p class="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">🎯 Titik Impas (BEP) / Balik Modal</p>
+                        <div class="grid grid-cols-2 gap-2 pt-1">
+                            <div>
+                                <p class="text-xs text-slate-400">Target Per Bulan</p>
+                                <p class="text-xl font-black text-white" id="bep-res-units-month">0 <span class="text-xs font-normal text-slate-400">pcs</span></p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-slate-400">Target Per Hari (30hr)</p>
+                                <p class="text-xl font-black text-emerald-400" id="bep-res-units-day">0 <span class="text-xs font-normal text-slate-400">pcs/hari</span></p>
+                            </div>
+                        </div>
+                        <div class="pt-2 border-t border-slate-700/60 flex justify-between items-center text-xs">
+                            <span class="text-slate-400">Minimal Omset Per Bulan:</span>
+                            <span class="font-bold text-white" id="bep-res-sales-rupiah">Rp0</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-emerald-950/60 rounded-2xl p-4 border border-emerald-500/30 space-y-2">
+                        <p class="text-[11px] text-emerald-400 font-bold uppercase tracking-wider">🚀 Untuk Capai Target Laba (<span id="bep-target-profit-lbl">Rp2.000.000</span>)</p>
+                        <div class="grid grid-cols-2 gap-2 pt-1">
+                            <div>
+                                <p class="text-xs text-slate-300">Harus Terjual / Bulan</p>
+                                <p class="text-xl font-black text-white" id="bep-res-target-units-month">0 <span class="text-xs font-normal text-slate-300">pcs</span></p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-slate-300">Target / Hari (30hr)</p>
+                                <p class="text-xl font-black text-emerald-300" id="bep-res-target-units-day">0 <span class="text-xs font-normal text-slate-300">pcs/hari</span></p>
+                            </div>
+                        </div>
+                        <div class="pt-2 border-t border-emerald-900/80 flex justify-between items-center text-xs">
+                            <span class="text-slate-300">Target Omset Per Bulan:</span>
+                            <span class="font-bold text-emerald-300" id="bep-res-target-sales-rupiah">Rp0</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= VIEW 8: PROFIL & PENGATURAN ================= -->
+            <section id="view-profile" class="hidden space-y-4">
+                <div class="bg-white dark:bg-slate-800 rounded-3xl p-5 border border-slate-100 dark:border-slate-800 shadow-sm space-y-4">
+                    <div class="flex items-center gap-4 border-b border-slate-100 dark:border-slate-700 pb-4">
+                        <div id="profile-avatar-large" class="w-16 h-16 rounded-full bg-brand-800 text-white font-extrabold text-2xl flex items-center justify-center shadow-md">
+                            U
+                        </div>
+                        <div>
+                            <h2 class="text-lg font-bold text-slate-900 dark:text-white" id="profile-display-name">User Usaha</h2>
+                            <p class="text-xs text-slate-500 dark:text-slate-400">Pemilik Bisnis / UMKM</p>
+                        </div>
+                    </div>
+
+                    <!-- Edit Profile Name Form -->
+                    <div class="space-y-3 pt-1">
+                        <h3 class="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">Pengaturan Profil</h3>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Nama Pemilik / Usaha</label>
+                            <input type="text" id="profile-input-name" placeholder="Masukkan nama Anda..." class="w-full p-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-sm font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                        </div>
+                        <button onclick="saveUserProfileName()" class="w-full py-3 bg-brand-800 hover:bg-brand-900 text-white font-bold text-xs rounded-xl shadow-sm transition active:scale-95">
+                            Simpan Perubahan Nama
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-slate-800 rounded-3xl p-5 border border-slate-100 dark:border-slate-800 shadow-sm space-y-4">
+                    <h3 class="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">Aplikasi & Data</h3>
+                    <div class="space-y-2">
+                        <button onclick="exportDataJSON()" class="w-full text-left p-3 rounded-xl bg-slate-50 dark:bg-slate-700/50 hover:bg-slate-100 text-xs font-semibold text-slate-700 dark:text-slate-200 flex items-center justify-between">
+                            <span>📤 Ekspor Cadangan Data (JSON)</span>
+                            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                        </button>
+                        <button onclick="triggerImportJSON()" class="w-full text-left p-3 rounded-xl bg-slate-50 dark:bg-slate-700/50 hover:bg-slate-100 text-xs font-semibold text-slate-700 dark:text-slate-200 flex items-center justify-between">
+                            <span>📥 Pulihkan Data (Impor JSON)</span>
+                            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                        </button>
+                        <button onclick="resetDataToDefault()" class="w-full text-left p-3 rounded-xl bg-red-50 dark:bg-red-950/40 hover:bg-red-100 text-xs font-semibold text-red-600 flex items-center justify-between">
+                            <span>⚠️ Reset Semua Data Bawaan</span>
+                            <svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Bottom Navigation Bar -->
+        <nav class="bg-white dark:bg-slate-800 border-t border-slate-100 dark:border-slate-800 fixed bottom-0 left-0 right-0 max-w-md mx-auto z-30 px-3 py-2 flex justify-around items-center shadow-lg">
+            <button onclick="switchTab('home')" id="nav-btn-home" class="flex flex-col items-center gap-1 text-brand-600 dark:text-emerald-400 transition">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                <span class="text-[10px] font-bold">Home</span>
+            </button>
+            <button onclick="switchTab('bahan')" id="nav-btn-bahan" class="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-600 transition">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                <span class="text-[10px] font-medium">Bahan</span>
+            </button>
+            <button onclick="switchTab('produk')" id="nav-btn-produk" class="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-600 transition">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                <span class="text-[10px] font-medium">Produk</span>
+            </button>
+            <button onclick="openNewCalcForm()" id="nav-btn-hitung" class="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-600 transition">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                <span class="text-[10px] font-medium">Hitung</span>
+            </button>
+            <button onclick="switchTab('bep')" id="nav-btn-bep" class="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-600 transition">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 18h12l3-18H3zm3 0V4a2 2 0 012-2h8a2 2 0 012 2v2M9 14l2 2 4-4"></path></svg>
+                <span class="text-[10px] font-medium">BEP</span>
+            </button>
+        </nav>
+
+        <!-- Custom Notification Modal -->
+        <div id="custom-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div class="bg-white dark:bg-slate-800 rounded-3xl p-6 max-w-xs w-full shadow-2xl border border-slate-100 dark:border-slate-700 text-center space-y-4 animate-in fade-in zoom-in-95 duration-150">
+                <div id="modal-icon" class="w-12 h-12 rounded-2xl bg-emerald-100 text-brand-600 flex items-center justify-center mx-auto">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                </div>
+                <div class="space-y-1">
+                    <h3 id="modal-title" class="text-base font-bold text-slate-900 dark:text-white">Berhasil</h3>
+                    <p id="modal-message" class="text-xs text-slate-500 dark:text-slate-400">Pesan konfirmasi...</p>
+                </div>
+                <div id="modal-buttons" class="flex gap-2 pt-2">
+                    <button onclick="closeModal()" class="w-full py-2.5 bg-brand-800 text-white font-bold text-xs rounded-xl hover:bg-brand-900 transition">OK</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add / Edit Material Modal -->
+        <div id="material-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div class="bg-white dark:bg-slate-800 rounded-3xl p-6 max-w-sm w-full shadow-2xl border border-slate-100 dark:border-slate-700 space-y-4">
+                <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-3">
+                    <h3 id="material-modal-title" class="text-base font-bold text-slate-900 dark:text-white">Tambah Bahan Baku</h3>
+                    <button onclick="closeMaterialModal()" class="text-slate-400 hover:text-slate-600">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+                <input type="hidden" id="edit-material-id">
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Nama Bahan</label>
+                        <input type="text" id="mat-input-name" placeholder="Contoh: Tepung Terigu" class="w-full p-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-sm font-semibold text-slate-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Harga Beli (Rp)</label>
+                            <input type="text" inputmode="numeric" id="mat-input-price" oninput="formatInputThousands(this)" placeholder="10.000" class="w-full p-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-sm font-semibold text-slate-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Jumlah / Satuan</label>
+                            <div class="flex gap-1">
+                                <input type="number" step="any" id="mat-input-qty" placeholder="1000" class="w-full p-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-sm font-semibold text-slate-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Satuan Unit (gr, ml, pcs, bungkus)</label>
+                        <input type="text" id="mat-input-unit" placeholder="gr" class="w-full p-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-sm font-semibold text-slate-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                    </div>
+                </div>
+                <div class="flex gap-2 pt-2">
+                    <button onclick="closeMaterialModal()" class="flex-1 py-3 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs rounded-xl hover:bg-slate-200 transition">Batal</button>
+                    <button onclick="saveMaterialData()" class="flex-1 py-3 bg-brand-800 text-white font-bold text-xs rounded-xl hover:bg-brand-900 transition">Simpan</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        const STORAGE_KEY = "kalkulator_bisnis_pro_data_v2";
+
+        let defaultData = {
+            profile: {
+                name: "Rian Utama"
+            },
+            materials: [
+                { id: "m1", name: "Tepung Terigu", price: 12000, qty: 1000, unit: "gr" },
+                { id: "m2", name: "Gula Pasir", price: 15000, qty: 1000, unit: "gr" },
+                { id: "m3", name: "Telur Ayam", price: 28000, qty: 1000, unit: "gr" },
+                { id: "m4", name: "Mentega / Butter", price: 20000, qty: 250, unit: "gr" },
+                { id: "m5", name: "Susu UHT", price: 18000, qty: 1000, unit: "ml" },
+                { id: "m6", name: "Kopi Espresso / Bubuk", price: 65000, qty: 500, unit: "gr" },
+                { id: "m7", name: "Susu Kental Manis", price: 14000, qty: 370, unit: "ml" },
+                { id: "m8", name: "Gula Aren Cair", price: 35000, qty: 1000, unit: "ml" },
+                { id: "m9", name: "Cup & Tutup Plastik", price: 500, qty: 1, unit: "pcs" },
+                { id: "m10", name: "Sedotan / Kantong", price: 200, qty: 1, unit: "pcs" }
+            ],
+            products: [
+                {
+                    id: "p1",
+                    name: "Kopi Susu Gula Aren",
+                    date: "08 April 2026",
+                    ingredients: [
+                        { materialId: "m6", qty: 20, unit: "gr" },
+                        { materialId: "m5", qty: 120, unit: "ml" },
+                        { materialId: "m8", qty: 30, unit: "ml" },
+                        { materialId: "m9", qty: 1, unit: "pcs" },
+                        { materialId: "m10", qty: 1, unit: "pcs" }
+                    ],
+                    labor: 1500,
+                    overhead: 1000,
+                    targetMargin: 30,
+                    rounding: 500,
+                    customPrice: 18000
+                }
+            ],
+            history: [
+                { id: "h1", title: "Membuat kalkulasi 'Kopi Susu Gula Aren'", date: "08 April 2026", type: "create" }
+            ]
+        };
+
+        let appData = loadAppData();
+        let currentActiveTab = 'home';
+        let currentDetailProductId = null;
+        let editingProductId = null;
+        let searchKeyword = '';
+
+        function loadAppData() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                try {
+                    return JSON.parse(saved);
+                } catch (e) {
+                    return defaultData;
+                }
+            }
+            return defaultData;
+        }
+
+        function saveAppData() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+            updateRealtimeDate();
+            renderDashboardStats();
+        }
+
+        function updateRealtimeDate() {
+            const now = new Date();
+            const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+            const dateStr = now.toLocaleDateString('id-ID', options);
+
+            // Update Header & Card Date
+            const dateEl1 = document.getElementById('current-date-str');
+            const dateEl2 = document.getElementById('card-date-str');
+            if (dateEl1) dateEl1.innerText = dateStr;
+            if (dateEl2) dateEl2.innerText = dateStr;
+
+            // Greeting based on hour
+            const hour = now.getHours();
+            let greet = "Selamat Pagi";
+            if (hour >= 11 && hour < 15) greet = "Selamat Siang";
+            else if (hour >= 15 && hour < 18) greet = "Selamat Sore";
+            else if (hour >= 18 || hour < 4) greet = "Selamat Malam";
+
+            const greetEl = document.getElementById('greeting-text');
+            if (greetEl) greetEl.innerText = `${greet}, ${appData.profile.name || 'User'}`;
+
+            // Update avatar initials
+            const initials = (appData.profile.name || 'U').charAt(0).toUpperCase();
+            const avatarBtn = document.getElementById('header-avatar-btn');
+            if (avatarBtn) avatarBtn.innerText = initials;
+            const profileLarge = document.getElementById('profile-avatar-large');
+            if (profileLarge) profileLarge.innerText = initials;
+            const dispName = document.getElementById('profile-display-name');
+            if (dispName) dispName.innerText = appData.profile.name || 'User Usaha';
+            const profileInput = document.getElementById('profile-input-name');
+            if (profileInput && document.activeElement !== profileInput) {
+                profileInput.value = appData.profile.name || '';
+            }
+        }
+
+        // Run date updater every minute for midnight date switches
+        setInterval(updateRealtimeDate, 60000);
+
+        function switchTab(tabName) {
+            currentActiveTab = tabName;
+            const views = ['home', 'bahan', 'produk', 'detail', 'hitung', 'riwayat', 'bep', 'profile'];
+            views.forEach(v => {
+                const el = document.getElementById(`view-${v}`);
+                if (el) {
+                    if (v === tabName) el.classList.remove('hidden');
+                    else el.classList.add('hidden');
+                }
+            });
+
+            // Header state management
+            const headerHome = document.getElementById('header-home');
+            const headerPage = document.getElementById('header-page');
+            const pageTitle = document.getElementById('page-title');
+
+            if (tabName === 'home') {
+                headerHome.classList.remove('hidden');
+                headerPage.classList.add('hidden');
+            } else {
+                headerHome.classList.add('hidden');
+                headerPage.classList.remove('hidden');
+                const titles = {
+                    bahan: 'Daftar Bahan Baku',
+                    produk: 'Daftar Produk & Resep',
+                    detail: 'Detail Kalkulasi',
+                    hitung: editingProductId ? 'Edit Resep / Produk' : 'Kalkulator HPP Baru',
+                    riwayat: 'Riwayat Aktivitas',
+                    bep: 'Analisis BEP',
+                    profile: 'Profil & Pengaturan'
+                };
+                if (pageTitle) pageTitle.innerText = titles[tabName] || 'Menu';
+            }
+
+            // Bottom Nav styling
+            const navTabs = ['home', 'bahan', 'produk', 'hitung', 'bep'];
+            navTabs.forEach(t => {
+                const btn = document.getElementById(`nav-btn-${t}`);
+                if (btn) {
+                    if (t === tabName) {
+                        btn.className = "flex flex-col items-center gap-1 text-brand-600 dark:text-emerald-400 transition";
+                    } else {
+                        btn.className = "flex flex-col items-center gap-1 text-slate-400 hover:text-slate-600 transition";
+                    }
+                }
+            });
+
+            // Hide search & more menu on switch
+            document.getElementById('search-bar-container').classList.add('hidden');
+            document.getElementById('more-options-menu').classList.add('hidden');
+
+            // Render specific tab contents
+            if (tabName === 'home') renderDashboardStats();
+            if (tabName === 'bahan') renderMaterialsList();
+            if (tabName === 'produk') renderProductsList();
+            if (tabName === 'riwayat') renderFullHistoryList();
+            if (tabName === 'bep') initBepDropdown();
+            if (tabName === 'hitung' && !editingProductId) {
+                // If opening new calc form fresh
+                resetHitungForm();
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function renderDashboardStats() {
+            document.getElementById('stat-total-produk').innerText = appData.products.length;
+            document.getElementById('stat-total-material').innerText = appData.materials.length;
+            document.getElementById('count-calc-month').innerText = appData.products.length;
+
+            // Render Recent Activities
+            const container = document.getElementById('recent-activities-list');
+            if (!container) return;
+
+            if (appData.history.length === 0) {
+                container.innerHTML = `<div class="p-4 bg-white dark:bg-slate-800 rounded-2xl text-center text-xs text-slate-400">Belum ada aktivitas tercatat.</div>`;
+                return;
+            }
+
+            let html = '';
+            appData.history.slice(0, 5).forEach(h => {
+                let iconBg = "bg-emerald-100 text-brand-700 dark:bg-slate-700 dark:text-emerald-400";
+                html += `
+                    <div class="bg-white dark:bg-slate-800 p-3.5 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm flex items-center justify-between gap-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl ${iconBg} flex items-center justify-center font-bold text-sm">
+                                📊
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold text-slate-900 dark:text-white">${h.title}</p>
+                                <p class="text-[10px] text-slate-400 mt-0.5">${h.date}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+            updateRealtimeDate();
+        }
+
+        function renderMaterialsList() {
+            const container = document.getElementById('materials-list');
+            const foundText = document.getElementById('bahan-found-text');
+            const countVal = document.getElementById('bahan-count-val');
+            const valVal = document.getElementById('bahan-value-val');
+
+            let filtered = appData.materials;
+            if (searchKeyword.trim() !== '') {
+                filtered = filtered.filter(m => m.name.toLowerCase().includes(searchKeyword.toLowerCase()));
+            }
+
+            if (countVal) countVal.innerText = appData.materials.length;
+            if (foundText) foundText.innerText = `${filtered.length} bahan ditemukan`;
+
+            let totalValSum = appData.materials.reduce((acc, m) => acc + (m.price || 0), 0);
+            if (valVal) valVal.innerText = formatRupiah(totalValSum);
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="p-6 bg-white dark:bg-slate-800 rounded-2xl text-center text-xs text-slate-400">Tidak ada bahan ditemukan.</div>`;
+                return;
+            }
+
+            let html = '';
+            filtered.forEach(m => {
+                let unitPriceEst = m.qty > 0 ? (m.price / m.qty) : m.price;
+                html += `
+                    <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm flex justify-between items-center">
+                        <div>
+                            <h4 class="text-xs font-bold text-slate-900 dark:text-white">${m.name}</h4>
+                            <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Beli: ${formatRupiah(m.price)} / ${m.qty} ${m.unit}</p>
+                            <p class="text-[10px] text-brand-600 dark:text-emerald-400 font-semibold mt-0.5">HPP Dasar: ${formatRupiah(unitPriceEst)} per ${m.unit}</p>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <button onclick="openEditMaterialModal('${m.id}')" class="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 transition" title="Edit">
+                                ✏️
+                            </button>
+                            <button onclick="deleteMaterial('${m.id}')" class="p-2 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/30 text-red-500 transition" title="Hapus">
+                                🗑️
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function openAddMaterialModal() {
+            document.getElementById('material-modal-title').innerText = "Tambah Bahan Baku";
+            document.getElementById('edit-material-id').value = "";
+            document.getElementById('mat-input-name').value = "";
+            document.getElementById('mat-input-price').value = "";
+            document.getElementById('mat-input-qty').value = "1000";
+            document.getElementById('mat-input-unit').value = "gr";
+            document.getElementById('material-modal').classList.remove('hidden');
+        }
+
+        function openEditMaterialModal(id) {
+            const m = appData.materials.find(item => item.id === id);
+            if (!m) return;
+            document.getElementById('material-modal-title').innerText = "Edit Bahan Baku";
+            document.getElementById('edit-material-id').value = m.id;
+            document.getElementById('mat-input-name').value = m.name;
+            document.getElementById('mat-input-price').value = m.price.toLocaleString('id-ID');
+            document.getElementById('mat-input-qty').value = m.qty;
+            document.getElementById('mat-input-unit').value = m.unit;
+            document.getElementById('material-modal').classList.remove('hidden');
+        }
+
+        function closeMaterialModal() {
+            document.getElementById('material-modal').classList.add('hidden');
+        }
+
+        function saveMaterialData() {
+            const id = document.getElementById('edit-material-id').value;
+            const name = document.getElementById('mat-input-name').value.trim();
+            const price = parseCleanNumber(document.getElementById('mat-input-price').value);
+            const qty = parseFloat(document.getElementById('mat-input-qty').value) || 1;
+            const unit = document.getElementById('mat-input-unit').value.trim() || 'gr';
+
+            if (!name || isNaN(price)) {
+                showModal("Peringatan", "Nama bahan dan harga harus diisi dengan benar.", "warning");
+                return;
+            }
+
+            if (id) {
+                const idx = appData.materials.findIndex(item => item.id === id);
+                if (idx !== -1) {
+                    appData.materials[idx] = { id, name, price, qty, unit };
+                }
+            } else {
+                const newId = 'm_' + Date.now();
+                appData.materials.push({ id: newId, name, price, qty, unit });
+            }
+
+            saveAppData();
+            closeMaterialModal();
+            renderMaterialsList();
+            showModal("Sukses", "Data bahan berhasil disimpan!", "success");
+        }
+
+        function deleteMaterial(id) {
+            appData.materials = appData.materials.filter(m => m.id !== id);
+            saveAppData();
+            renderMaterialsList();
+            showModal("Terhapus", "Bahan baku berhasil dihapus.", "success");
+        }
+
+        function renderProductsList() {
+            const container = document.getElementById('products-list');
+            const foundText = document.getElementById('product-found-text');
+            let filtered = appData.products;
+
+            if (searchKeyword.trim() !== '') {
+                filtered = filtered.filter(p => p.name.toLowerCase().includes(searchKeyword.toLowerCase()));
+            }
+
+            if (foundText) foundText.innerText = `${filtered.length} produk ditemukan`;
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="p-6 bg-white dark:bg-slate-800 rounded-2xl text-center text-xs text-slate-400">Belum ada produk tersimpan. Buat kalkulasi HPP baru!</div>`;
+                return;
+            }
+
+            let html = '';
+            filtered.forEach(p => {
+                const calc = calculateProductFinancials(p);
+                html += `
+                    <div onclick="openProductDetail('${p.id}')" class="bg-white dark:bg-slate-800 p-4 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm hover:border-brand-500/50 transition cursor-pointer space-y-3">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h4 class="text-sm font-bold text-slate-900 dark:text-white">${p.name}</h4>
+                                <p class="text-[11px] text-slate-400 mt-0.5">${p.date}</p>
+                            </div>
+                            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-brand-700 dark:bg-emerald-950/50 dark:text-emerald-400">
+                                Margin +${calc.profitMarginPct}%
+                            </span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100 dark:border-slate-700 text-xs">
+                            <div>
+                                <span class="text-slate-400 block text-[10px]">HPP Modal</span>
+                                <strong class="text-slate-900 dark:text-white font-bold">${formatRupiah(calc.hpp)}</strong>
+                            </div>
+                            <div>
+                                <span class="text-slate-400 block text-[10px]">Harga Jual</span>
+                                <strong class="text-brand-600 dark:text-emerald-400 font-bold">${formatRupiah(calc.finalPrice)}</strong>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function calculateProductFinancials(p) {
+            let totalBahan = 0;
+            p.ingredients.forEach(item => {
+                const mat = appData.materials.find(m => m.id === item.materialId);
+                if (mat && mat.qty > 0) {
+                    let costPerUnit = mat.price / mat.qty;
+                    totalBahan += costPerUnit * item.qty;
+                }
+            });
+
+            const labor = p.labor || 0;
+            const overhead = p.overhead || 0;
+            const hpp = totalBahan + labor + overhead;
+
+            let targetMargin = p.targetMargin || 25;
+            let recommended = hpp / (1 - (targetMargin / 100));
+
+            // Rounding
+            let rounding = p.rounding || 100;
+            if (rounding > 1) {
+                recommended = Math.ceil(recommended / rounding) * rounding;
+            }
+
+            let finalPrice = p.customPrice !== undefined && p.customPrice !== null ? p.customPrice : recommended;
+            let profit = finalPrice - hpp;
+            let profitMarginPct = finalPrice > 0 ? ((profit / finalPrice) * 100).toFixed(1) : 0;
+
+            return {
+                totalBahan,
+                labor,
+                overhead,
+                hpp,
+                recommended,
+                finalPrice,
+                profit,
+                profitMarginPct
+            };
+        }
+
+        function openProductDetail(id) {
+            currentDetailProductId = id;
+            const p = appData.products.find(item => item.id === id);
+            if (!p) return;
+
+            const calc = calculateProductFinancials(p);
+
+            document.getElementById('detail-title').innerText = p.name;
+            document.getElementById('detail-date').innerText = p.date || 'Rabu, 08 April 2026';
+            document.getElementById('detail-pcs').innerText = "1";
+            document.getElementById('detail-hpp').innerText = formatRupiah(calc.hpp);
+            document.getElementById('detail-recommended-price').innerText = formatRupiah(calc.recommended);
+            document.getElementById('detail-base-margin').innerText = `${p.targetMargin}%`;
+            
+            const customInput = document.getElementById('detail-input-custom-price');
+            customInput.value = calc.finalPrice.toLocaleString('id-ID');
+
+            document.getElementById('detail-profit').innerText = formatRupiah(calc.profit);
+            document.getElementById('detail-final-margin').innerText = `+${calc.profitMarginPct}%`;
+
+            document.getElementById('detail-cost-bahan').innerText = formatRupiah(calc.totalBahan);
+            document.getElementById('detail-cost-tenaga').innerText = formatRupiah(calc.labor);
+            document.getElementById('detail-cost-overhead').innerText = formatRupiah(calc.overhead);
+
+            // Render Ingredients Breakdown
+            const ingContainer = document.getElementById('detail-ingredients-list');
+            document.getElementById('detail-bahan-count').innerText = p.ingredients.length;
+            let html = '';
+            p.ingredients.forEach(item => {
+                const mat = appData.materials.find(m => m.id === item.materialId);
+                let matName = mat ? mat.name : 'Bahan Dihapus';
+                let costPerUnit = (mat && mat.qty > 0) ? (mat.price / mat.qty) : 0;
+                let subtotal = costPerUnit * item.qty;
+
+                html += `
+                    <div class="flex justify-between items-center text-xs pb-2 border-b border-slate-100 dark:border-slate-700/60 last:border-none">
+                        <div>
+                            <p class="font-bold text-slate-800 dark:text-slate-200">${matName}</p>
+                            <p class="text-[10px] text-slate-400">${item.qty} ${item.unit}</p>
+                        </div>
+                        <span class="font-extrabold text-slate-900 dark:text-white">${formatRupiah(subtotal)}</span>
+                    </div>
+                `;
+            });
+            ingContainer.innerHTML = html;
+
+            switchTab('detail');
+        }
+
+        function applyRecommendedToCustom() {
+            const p = appData.products.find(item => item.id === currentDetailProductId);
+            if (!p) return;
+            const calc = calculateProductFinancials(p);
+            document.getElementById('detail-input-custom-price').value = Math.round(calc.recommended).toLocaleString('id-ID');
+            handleCustomPriceInputChanged();
+        }
+
+        function handleCustomPriceInputChanged() {
+            const p = appData.products.find(item => item.id === currentDetailProductId);
+            if (!p) return;
+            const customVal = parseCleanNumber(document.getElementById('detail-input-custom-price').value);
+            p.customPrice = customVal;
+            saveAppData();
+
+            const calc = calculateProductFinancials(p);
+            document.getElementById('detail-profit').innerText = formatRupiah(calc.profit);
+            document.getElementById('detail-final-margin').innerText = `+${calc.profitMarginPct}%`;
+        }
+
+        function triggerEditCurrentDetail() {
+            const p = appData.products.find(item => item.id === currentDetailProductId);
+            if (!p) return;
+            openEditProductForm(p);
+        }
+
+        function triggerDeleteCurrentDetail() {
+            appData.products = appData.products.filter(item => item.id !== currentDetailProductId);
+            saveAppData();
+            switchTab('produk');
+            showModal("Terhapus", "Produk berhasil dihapus.", "success");
+        }
+
+        function openNewCalcForm() {
+            editingProductId = null;
+            document.getElementById('calc-form-title').innerText = "Kalkulasi HPP Baru";
+            document.getElementById('calc-input-name').value = "";
+            document.getElementById('calc-input-labor').value = "0";
+            document.getElementById('calc-input-overhead').value = "1.000";
+            document.getElementById('calc-input-margin').value = "25";
+            document.getElementById('calc-input-rounding').value = "100";
+
+            const container = document.getElementById('calc-ingredients-container');
+            container.innerHTML = "";
+            addCalcIngredientRow();
+            addCalcIngredientRow();
+            runLiveCalculation();
+            switchTab('hitung');
+        }
+
+        function openEditProductForm(p) {
+            editingProductId = p.id;
+            document.getElementById('calc-form-title').innerText = "Edit Resep / Produk";
+            document.getElementById('calc-input-name').value = p.name;
+            document.getElementById('calc-input-labor').value = p.labor.toLocaleString('id-ID');
+            document.getElementById('calc-input-overhead').value = p.overhead.toLocaleString('id-ID');
+            document.getElementById('calc-input-margin').value = p.targetMargin || 25;
+            document.getElementById('calc-input-rounding').value = p.rounding || 100;
+
+            const container = document.getElementById('calc-ingredients-container');
+            container.innerHTML = "";
+            p.ingredients.forEach(item => {
+                addCalcIngredientRow(item.materialId, item.qty);
+            });
+            runLiveCalculation();
+            switchTab('hitung');
+        }
+
+        function addCalcIngredientRow(selectedMatId = '', qtyVal = 10) {
+            const container = document.getElementById('calc-ingredients-container');
+            const rowId = 'ing_row_' + Date.now() + Math.random().toString(36).substring(2, 5);
+
+            let optionsHtml = '<option value="">Pilih Bahan...</option>';
+            appData.materials.forEach(m => {
+                let sel = (m.id === selectedMatId) ? 'selected' : '';
+                optionsHtml += `<option value="${m.id}" ${sel}>${m.name} (${m.unit})</option>`;
+            });
+
+            const div = document.createElement('div');
+            div.className = "flex gap-2 items-center bg-slate-50 dark:bg-slate-700/50 p-2.5 rounded-2xl border border-slate-100 dark:border-slate-700";
+            div.id = rowId;
+            div.innerHTML = `
+                <select class="calc-mat-select flex-1 p-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-xl text-xs font-semibold text-slate-800 dark:text-slate-100 focus:outline-none" onchange="runLiveCalculation()">
+                    ${optionsHtml}
+                </select>
+                <input type="number" step="any" value="${qtyVal}" placeholder="Jumlah" class="calc-qty-input w-20 p-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-xl text-xs font-semibold text-slate-800 dark:text-slate-100 focus:outline-none" oninput="runLiveCalculation()">
+                <button onclick="document.getElementById('${rowId}').remove(); runLiveCalculation();" class="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-xl transition">
+                    🗑️
+                </button>
+            `;
+            container.appendChild(div);
+            runLiveCalculation();
+        }
+
+        function runLiveCalculation() {
+            let totalBahan = 0;
+            const rows = document.querySelectorAll('#calc-ingredients-container > div');
+            rows.forEach(row => {
+                const matId = row.querySelector('.calc-mat-select').value;
+                const qty = parseFloat(row.querySelector('.calc-qty-input').value) || 0;
+                const mat = appData.materials.find(m => m.id === matId);
+                if (mat && mat.qty > 0) {
+                    let costPerUnit = mat.price / mat.qty;
+                    totalBahan += costPerUnit * qty;
+                }
+            });
+
+            const labor = parseCleanNumber(document.getElementById('calc-input-labor').value);
+            const overhead = parseCleanNumber(document.getElementById('calc-input-overhead').value);
+            const hpp = totalBahan + labor + overhead;
+            const targetMargin = parseFloat(document.getElementById('calc-input-margin').value) || 25;
+            let recommended = hpp / (1 - (targetMargin / 100));
+            const rounding = parseInt(document.getElementById('calc-input-rounding').value) || 1;
+
+            if (rounding > 1) {
+                recommended = Math.ceil(recommended / rounding) * rounding;
+            }
+
+            document.getElementById('calc-preview-hpp').innerText = formatRupiah(hpp);
+            document.getElementById('calc-preview-price').innerText = formatRupiah(recommended);
+        }
+
+        function saveProductCalculation() {
+            const name = document.getElementById('calc-input-name').value.trim();
+            if (!name) {
+                showModal("Peringatan", "Nama produk atau resep wajib diisi.", "warning");
+                return;
+            }
+
+            const rows = document.querySelectorAll('#calc-ingredients-container > div');
+            let ingredients = [];
+            rows.forEach(row => {
+                const materialId = row.querySelector('.calc-mat-select').value;
+                const qty = parseFloat(row.querySelector('.calc-qty-input').value) || 0;
+                if (materialId && qty > 0) {
+                    const mat = appData.materials.find(m => m.id === materialId);
+                    ingredients.push({ materialId, qty, unit: mat ? mat.unit : 'gr' });
+                }
+            });
+
+            if (ingredients.length === 0) {
+                showModal("Peringatan", "Minimal masukkan 1 bahan baku yang valid.", "warning");
+                return;
+            }
+
+            const labor = parseCleanNumber(document.getElementById('calc-input-labor').value);
+            const overhead = parseCleanNumber(document.getElementById('calc-input-overhead').value);
+            const targetMargin = parseFloat(document.getElementById('calc-input-margin').value) || 25;
+            const rounding = parseInt(document.getElementById('calc-input-rounding').value) || 100;
+
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+
+            if (editingProductId) {
+                const idx = appData.products.findIndex(p => p.id === editingProductId);
+                if (idx !== -1) {
+                    appData.products[idx].name = name;
+                    appData.products[idx].ingredients = ingredients;
+                    appData.products[idx].labor = labor;
+                    appData.products[idx].overhead = overhead;
+                    appData.products[idx].targetMargin = targetMargin;
+                    appData.products[idx].rounding = rounding;
+                }
+                appData.history.unshift({
+                    id: 'h_' + Date.now(),
+                    title: `Memperbarui kalkulasi '${name}'`,
+                    date: dateStr,
+                    type: 'update'
+                });
+                showModal("Sukses", "Perubahan produk berhasil disimpan!", "success");
+            } else {
+                const newId = 'p_' + Date.now();
+                appData.products.push({
+                    id: newId,
+                    name,
+                    date: dateStr,
+                    ingredients,
+                    labor,
+                    overhead,
+                    targetMargin,
+                    rounding,
+                    customPrice: null
+                });
+                appData.history.unshift({
+                    id: 'h_' + Date.now(),
+                    title: `Membuat kalkulasi '${name}'`,
+                    date: dateStr,
+                    type: 'create'
+                });
+                showModal("Sukses", "Kalkulasi HPP baru berhasil dibuat!", "success");
+            }
+
+            editingProductId = null;
+            saveAppData();
+            switchTab('produk');
+        }
+
+        function initBepDropdown() {
+            const select = document.getElementById('bep-product-select');
+            if (!select) return;
+
+            let html = '<option value="">-- Pilih dari Produk Tersimpan --</option>';
+            appData.products.forEach(p => {
+                html += `<option value="${p.id}">${p.name}</option>`;
+            });
+            select.innerHTML = html;
+
+            if (appData.products.length > 0) {
+                select.value = appData.products[0].id;
+                onBepProductSelected();
+            } else {
+                document.getElementById('bep-input-price').value = "15000";
+                document.getElementById('bep-input-hpp').value = "10000";
+                runBepCalculation();
+            }
+        }
+
+        function onBepProductSelected() {
+            const selectId = document.getElementById('bep-product-select').value;
+            if (!selectId) return;
+            const p = appData.products.find(item => item.id === selectId);
+            if (!p) return;
+
+            const calc = calculateProductFinancials(p);
+            document.getElementById('bep-input-price').value = Math.round(calc.finalPrice).toLocaleString('id-ID');
+            document.getElementById('bep-input-hpp').value = Math.round(calc.hpp).toLocaleString('id-ID');
+            runBepCalculation();
+        }
+
+        function runBepCalculation() {
+            const price = parseCleanNumber(document.getElementById('bep-input-price').value);
+            const hpp = parseCleanNumber(document.getElementById('bep-input-hpp').value);
+
+            const sewa = parseCleanNumber(document.getElementById('bep-fc-sewa').value);
+            const gaji = parseCleanNumber(document.getElementById('bep-fc-gaji').value);
+            const utility = parseCleanNumber(document.getElementById('bep-fc-utility').value);
+            const lain = parseCleanNumber(document.getElementById('bep-fc-lain').value);
+            const totalFixedCost = sewa + gaji + utility + lain;
+
+            const targetProfit = parseCleanNumber(document.getElementById('bep-input-target-profit').value);
+            document.getElementById('bep-target-profit-lbl').innerText = formatRupiah(targetProfit);
+
+            const marginUnit = price - hpp;
+            document.getElementById('bep-res-margin-unit').innerText = formatRupiah(marginUnit);
+
+            if (marginUnit <= 0) {
+                document.getElementById('bep-res-units-month').innerText = "0 pcs";
+                document.getElementById('bep-res-units-day').innerText = "0 pcs";
+                document.getElementById('bep-res-sales-rupiah').innerText = "Rp0";
+                document.getElementById('bep-res-target-units-month').innerText = "0 pcs";
+                document.getElementById('bep-res-target-units-day').innerText = "0 pcs";
+                document.getElementById('bep-res-target-sales-rupiah').innerText = "Rp0";
+                return;
+            }
+
+            // BEP Units = Fixed Cost / Margin Unit
+            const bepUnitsMonth = Math.ceil(totalFixedCost / marginUnit);
+            const bepUnitsDay = Math.ceil(bepUnitsMonth / 30);
+            const bepSalesRupiah = bepUnitsMonth * price;
+
+            document.getElementById('bep-res-units-month').innerHTML = `${bepUnitsMonth} <span class="text-xs font-normal text-slate-400">pcs</span>`;
+            document.getElementById('bep-res-units-day').innerHTML = `${bepUnitsDay} <span class="text-xs font-normal text-slate-400">pcs/hari</span>`;
+            document.getElementById('bep-res-sales-rupiah').innerText = formatRupiah(bepSalesRupiah);
+
+            // Target Profit Units = (Fixed Cost + Target Profit) / Margin Unit
+            const targetUnitsMonth = Math.ceil((totalFixedCost + targetProfit) / marginUnit);
+            const targetUnitsDay = Math.ceil(targetUnitsMonth / 30);
+            const targetSalesRupiah = targetUnitsMonth * price;
+
+            document.getElementById('bep-res-target-units-month').innerHTML = `${targetUnitsMonth} <span class="text-xs font-normal text-slate-300">pcs</span>`;
+            document.getElementById('bep-res-target-units-day').innerHTML = `${targetUnitsDay} <span class="text-xs font-normal text-slate-300">pcs/hari</span>`;
+            document.getElementById('bep-res-target-sales-rupiah').innerText = formatRupiah(targetSalesRupiah);
+        }
+
+        function saveUserProfileName() {
+            const nameInput = document.getElementById('profile-input-name').value.trim();
+            if (!nameInput) {
+                showModal("Peringatan", "Nama tidak boleh kosong.", "warning");
+                return;
+            }
+            appData.profile.name = nameInput;
+            saveAppData();
+            updateRealtimeDate();
+            showModal("Sukses", "Nama profil berhasil diperbarui!", "success");
+        }
+
+        function toggleSearchBar() {
+            const bar = document.getElementById('search-bar-container');
+            bar.classList.toggle('hidden');
+            if (!bar.classList.contains('hidden')) {
+                document.getElementById('global-search-input').focus();
+            }
+        }
+
+        function clearSearchInput() {
+            document.getElementById('global-search-input').value = '';
+            handleGlobalSearch('');
+        }
+
+        function handleGlobalSearch(keyword) {
+            searchKeyword = keyword;
+            if (currentActiveTab === 'bahan') renderMaterialsList();
+            if (currentActiveTab === 'produk') renderProductsList();
+        }
+
+        function toggleMoreMenu() {
+            const menu = document.getElementById('more-options-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        function renderFullHistoryList() {
+            const container = document.getElementById('full-history-list');
+            if (!container) return;
+
+            if (appData.history.length === 0) {
+                container.innerHTML = `<div class="p-6 bg-white dark:bg-slate-800 rounded-2xl text-center text-xs text-slate-400">Belum ada riwayat aktivitas.</div>`;
+                return;
+            }
+
+            let html = '';
+            appData.history.forEach(h => {
+                html += `
+                    <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-bold text-slate-900 dark:text-white">${h.title}</p>
+                            <p class="text-[10px] text-slate-400 mt-0.5">${h.date}</p>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function clearAllHistory() {
+            appData.history = [];
+            saveAppData();
+            renderFullHistoryList();
+            showModal("Terhapus", "Riwayat aktivitas telah dibersihkan.", "success");
+        }
+
+        function exportDataJSON() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `kalkulator_bisnis_backup_${Date.now()}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+            showModal("Sukses", "Data berhasil diekspor sebagai file JSON.", "success");
+        }
+
+        function triggerImportJSON() {
+            document.getElementById('import-file-input').click();
+        }
+
+        function importDataJSON(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    if (parsed && parsed.materials && parsed.products) {
+                        appData = parsed;
+                        saveAppData();
+                        switchTab('home');
+                        showModal("Sukses", "Data berhasil dipulihkan dari file backup!", "success");
+                    } else {
+                        throw new Error("Format file tidak valid");
+                    }
+                } catch (err) {
+                    showModal("Gagal", "Format file JSON tidak sesuai.", "warning");
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function resetDataToDefault() {
+            appData = JSON.parse(JSON.stringify(defaultData));
+            saveAppData();
+            switchTab('home');
+            showModal("Reset", "Aplikasi telah dikembalikan ke data bawaan.", "success");
+        }
+
+        function formatRupiah(num) {
+            return 'Rp' + Math.round(num).toLocaleString('id-ID');
+        }
+
+        function formatInputThousands(input) {
+            let val = input.value.replace(/[^0-9]/g, '');
+            if (val === '') {
+                input.value = '';
+                return;
+            }
+            input.value = parseInt(val, 10).toLocaleString('id-ID');
+        }
+
+        function parseCleanNumber(valStr) {
+            if (!valStr) return 0;
+            let cleaned = valStr.toString().replace(/[^0-9]/g, '');
+            return parseFloat(cleaned) || 0;
+        }
+
+        function showModal(title, message, type = 'success') {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-message').innerText = message;
+            const iconEl = document.getElementById('modal-icon');
+            if (type === 'warning') {
+                iconEl.className = "w-12 h-12 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center mx-auto";
+                iconEl.innerHTML = `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>`;
+            } else {
+                iconEl.className = "w-12 h-12 rounded-2xl bg-emerald-100 text-brand-600 flex items-center justify-center mx-auto";
+                iconEl.innerHTML = `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>`;
+            }
+            document.getElementById('custom-modal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('custom-modal').classList.add('hidden');
+        }
+
+        // Initialize on load
+        window.onload = function() {
+            updateRealtimeDate();
+            renderDashboardStats();
+        };
+    </script>
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js')
+      .then(() => console.log('Service Worker Terdaftar'));
+  }
+</script>
+
+</body>
+</html>
+```
